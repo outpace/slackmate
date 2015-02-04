@@ -2,6 +2,7 @@
 
 require 'optparse'
 require 'json'
+require 'yaml'
 
 def prepend(string, c)
   string.gsub /^([^#{c}])/, "#{c}\\1"
@@ -11,9 +12,9 @@ def prefixed_array_from(comma_separated_names, prefix)
   comma_separated_names.split(",").map {|name| prepend name, prefix}
 end
 
-def send_to_slack(body)
+def send_to_slack(slack_webhook_url, body)
   payload = "payload=#{body.to_json}"
-  cmd = "curl -sS -o /dev/null -X POST --data-urlencode '#{payload}' #{SLACK_WEBHOOK_URL}"
+  cmd = "curl -sS -o /dev/null -X POST --data-urlencode '#{payload}' #{slack_webhook_url}"
   puts cmd if @options[:verbose]
   `#{cmd}`
 end
@@ -25,9 +26,7 @@ def create_tmate_session
   `tmate -S /tmp/tmate.sock display -p '\#{tmate_ssh}'`.split[1]
 end
 
-@options = {emoji: ':leftshark:', 
-            prefix: 'please join ', 
-            verbose: false,
+@options = {verbose: false,
             recipients: []}
 
 OptionParser.new do |opts|
@@ -46,6 +45,28 @@ OptionParser.new do |opts|
   end
 end.parse!
 
+yaml_file="#{ENV['HOME']}/.slackmate"
+until File.exist? yaml_file do
+  print "#{yaml_file} does not exist. Enter the Slack webhook URL to be used (or <enter> to exit): " 
+  slack_webhook_url = gets
+  exit if slack_webhook_url.strip.empty?
+  
+  File.open(yaml_file, 'w') do |f| 
+    f << {prefix: 'please join ', 
+          slack_webhook_url: slack_webhook_url.strip,
+          emoji: ':two_men_holding_hands:'}.to_yaml
+  end
+end
+config = YAML.load(File.open(yaml_file))
+config = config.each_with_object({}) {|(k, v), h| h[k.to_sym] = v }
+
+@options.merge!(config)
+
+if !@options[:slack_webhook_url]
+  puts 'slack_webhook_url is required'
+  exit 1
+end
+
 if @options[:recipients].empty?
   puts 'at least one channel or user is required'
   exit 1
@@ -55,6 +76,7 @@ tmate_address = create_tmate_session
 
 author=`whoami`.strip!
 text="#{@options[:prefix]}<ssh://#{tmate_address}|tmate session>"
-@options[:recipients].each {|recipient| send_to_slack({channel: recipient, username: author, text: text, icon_emoji: @options[:emoji]})}
+@options[:recipients].each {|recipient| send_to_slack(@options[:slack_webhook_url],
+                                                      {channel: recipient, username: author, text: text, icon_emoji: @options[:emoji]})}
 
 exec "ssh #{tmate_address}"
