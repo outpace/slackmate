@@ -11,6 +11,12 @@ Copy/link the script into an executable directory on your path (/usr/local/bin)
 
 On first run, you will be prompted to supply the Slack webhook URL for incoming requests. You need to refer to the Slack home for your organization to set that URL up.
 
+Slack will post an ssh:// link. You will want to configure iTerm 2 to open when clicking on this link:
+
+1. Preferences->Profiles->+  (add a new profile).
+1. Under Preferences->Profiles->General->Command, select the Command radio button and enter $$.
+1. Under Preferences->Profiles->General->URL Schemes->Schemes handled, select ssh.
+
 ## Running
 
 `tm -h` for options:
