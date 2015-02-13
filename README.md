@@ -1,15 +1,21 @@
 # slackmate
-tmate utility for slack
+tmate utilities for slack
 
-* Requires v 1.8.10 or later of tmate 
+* Detached option requires v 1.8.10 or later of tmate 
 
 ```brew upgrade tmate```
 
 ## Installation
 
-Copy/link the script into an executable directory on your path (/usr/local/bin)
+Link the scripts (tm and/or tmslack) into an executable directory on your path (e.g. /usr/local/bin)
 
 On first run, you will be prompted to supply the Slack webhook URL for incoming requests. You need to refer to the Slack home for your organization to set that URL up.
+
+## Scripts
+
+tm: Creates a detached tmate session, posts invites to slack, joins the session. Downside: tmate limitations prevent some tmux commands from operating.
+
+tmslack: Posts invites to slack once you are in a tmate session.
 
 Slack will post an ssh:// link. You will want to configure iTerm 2 to open when clicking on this link:
 
@@ -20,15 +26,5 @@ Slack will post an ssh:// link. You will want to configure iTerm 2 to open when 
 ## Running
 
 `tm -h` for options:
-```
-Usage: tm [options]
-    -e, --emoji [EMOJI]              Emoji for the tmate request; default=:two_men_holding_hands:
-    -p [INVITATION_MESSAGE],         prefix; default=please join
-        --prefix
-    -v, --verbose                    verbose; default=false
-    -c, --channels CHANNEL_LIST      Channel names (# not required)
-    -u, --users USER_LIST            User names (@ not required)
-    -h, --help                       print this message
-```
+`tmslack -h` for options:
 
-# slackmate
