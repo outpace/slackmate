@@ -15,8 +15,6 @@ options = SlackOptions.new(SlackConfig.load)
 options.add_opt_on('-p', '--prefix [INVITE_MSG]', 'prefix', :prefix)
 exit 1 if !options.parse!
 
-puts "options #{options}"
-
 slack = Slack.new(options)
 
 text="#{options[:prefix]} <ssh://#{tmate_address}|tmate session>"
