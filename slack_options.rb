@@ -9,12 +9,12 @@ class SlackOptions
   end
 
   def fail_required_slack_webhook_url
-    puts 'slack_webhook_url is required'
+    puts 'slack_webhook_url is required. Run with -h for usage'
     false
   end
 
   def fail_required_channel_or_user
-    puts 'at least one channel or user is required'
+    puts 'at least one channel or user is required. Run with -h for usage'
     false
   end
 
@@ -42,10 +42,10 @@ class SlackOptions
     @parser = OptionParser.new do |opts|
       opts.on('-e', '--emoji [EMOJI]', "Emoji to display; default=#{ @options[:emoji] }") {|e| @options[:emoji] = e }
       opts.on('-v', '--verbose', "verbose; default=#{@options[:verbose]}") {|b| @options[:verbose] = b }
-      opts.on('-c', '--channels CHANNEL_LIST', 'Channel names') do |names| 
+      opts.on('-c', '--channels CHANNEL_LIST', 'Channel names') do |names|
         @options[:recipients].concat(prefixed_array_from(names, '#'))
       end
-      opts.on('-u', '--users USER_LIST', 'User names') do |names| 
+      opts.on('-u', '--users USER_LIST', 'User names') do |names|
         @options[:recipients].concat(prefixed_array_from(names, '@'))
       end
       opts.on_tail('-h', '--help', 'print this message') do
